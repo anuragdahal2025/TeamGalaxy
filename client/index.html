@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Team Galaxy — H&S Training</title>
+<style>
+  * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+  body { margin:0; background:#0f172a; color:#e2e8f0; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+  .card { background:#1e293b; padding:32px; border-radius:14px; width:340px; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+  h1 { font-size:20px; margin:0 0 4px; }
+  p.sub { margin:0 0 20px; color:#94a3b8; font-size:13px; }
+  label { font-size:13px; display:block; margin:12px 0 4px; }
+  input { width:100%; padding:10px; border:1px solid #334155; border-radius:8px; background:#0f172a; color:#e2e8f0; }
+  button { width:100%; margin-top:18px; padding:11px; border:0; border-radius:8px; background:#6366f1; color:#fff; font-weight:600; cursor:pointer; }
+  button:hover { background:#4f46e5; }
+  .msg { margin-top:12px; font-size:13px; min-height:18px; }
+  .err { color:#f87171; } .ok { color:#4ade80; }
+  .hidden { display:none; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; background:#6366f1; }
+  .logout { background:#334155; margin-top:10px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <!-- LOGIN VIEW -->
+    <div id="loginView">
+      <h1>Team Galaxy</h1>
+      <p class="sub">360° Health & Safety Training — Sign in</p>
+      <label>Email</label>
+      <input id="email" type="email" value="admin@galaxy.com" />
+      <label>Password</label>
+      <input id="password" type="password" value="Admin123" />
+      <button onclick="login()">Log In</button>
+      <div id="msg" class="msg"></div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashView" class="hidden">
+      <h1>Welcome, <span id="uName"></span></h1>
+      <p class="sub">Role: <span id="uRole" class="badge"></span></p>
+
+      <div id="adminPanel" class="hidden">
+        <p class="sub">Admin — create a trainee account:</p>
+        <input id="nName" placeholder="Full name" />
+        <input id="nEmail" placeholder="Email" style="margin-top:8px" />
+        <input id="nPass" placeholder="Password" style="margin-top:8px" />
+        <button onclick="createTrainee()">Create Trainee</button>
+      </div>
+
+      <div id="traineePanel" class="hidden">
+        <p class="sub">Your training modules will appear here (coming next).</p>
+      </div>
+
+      <div id="msg2" class="msg"></div>
+      <button class="logout" onclick="logout()">Log Out</button>
+    </div>
+  </div>
+
+<script>
+const API = "http://localhost:5050/api/auth";
+let token = "";
+
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+  msg.textContent = "Signing in...";
+  msg.className = "msg";
+  try {
+    const res = await fetch(API + "/login", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { msg.textContent = data.message; msg.className="msg err"; return; }
+    token = data.token;
+    showDashboard(data.user);
+  } catch { msg.textContent = "Cannot reach server. Is it running?"; msg.className="msg err"; }
+}
+
+function showDashboard(user) {
+  document.getElementById("loginView").classList.add("hidden");
+  document.getElementById("dashView").classList.remove("hidden");
+  document.getElementById("uName").textContent = user.name;
+  document.getElementById("uRole").textContent = user.role;
+  document.getElementById("adminPanel").classList.toggle("hidden", user.role !== "admin");
+  document.getElementById("traineePanel").classList.toggle("hidden", user.role !== "trainee");
+}
+
+async function createTrainee() {
+  const msg2 = document.getElementById("msg2");
+  const body = {
+    name: document.getElementById("nName").value,
+    email: document.getElementById("nEmail").value,
+    password: document.getElementById("nPass").value,
+    role: "trainee"
+  };
+  const res = await fetch(API + "/register", {
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  msg2.textContent = data.message;
+  msg2.className = res.ok ? "msg ok" : "msg err";
+}
+
+function logout() {
+  token = "";
+  document.getElementById("dashView").classList.add("hidden");
+  document.getElementById("loginView").classList.remove("hidden");
+  document.getElementById("msg").textContent = "";
+}
+</script>
+</body>
+</html>
