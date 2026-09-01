@@ -184,8 +184,8 @@ td{padding:13px 10px;border-top:1px solid var(--line);font-size:14px}
     </div>
     <div style="padding:22px">
       <label>Full name</label><input id="nName" placeholder="e.g. Sunita Rai" />
-      <label>Email (this is their login ID)</label><input id="nEmail" placeholder="email@galaxy.com" />
-      <label>Temporary password (you give this to the trainee)</label><input id="nPass" placeholder="min 4 characters" />
+      <label>Email (this is their login ID)</label><input id="nEmail" type="email" placeholder="email@galaxy.com" />
+      <label>Temporary password (min 6 characters)</label><input id="nPass" placeholder="min 6 characters" />
       <div style="margin-top:14px;padding:10px 12px;background:rgba(37,208,196,.08);border:1px solid rgba(37,208,196,.2);border-radius:9px;font-size:12px;color:var(--mut)">ℹ Trainees can't self-register — you create the account and share the email + temporary password with them. RBAC enforced.</div>
       <div id="createMsg" class="msg"></div>
     </div>
@@ -239,15 +239,23 @@ async function loadTrainees(){
 function openModal(){modal.classList.remove("hidden");}
 function closeModal(){modal.classList.add("hidden");createMsg.textContent="";nName.value=nEmail.value=nPass.value="";}
 async function createTrainee(){
-  const m=createMsg;if(!nName.value||!nEmail.value||!nPass.value){m.textContent="Fill all fields";m.className="msg err";return;}
-  try{await api("/auth/register","POST",{name:nName.value,email:nEmail.value,password:nPass.value,role:"trainee"});
-    m.textContent="✓ Account created — share the email & password with the trainee";m.className="msg ok";loadTrainees();
-    setTimeout(closeModal,1200);}
-  catch(e){m.textContent=e.message;m.className="msg err";}
+  const m=createMsg;
+  const name=nName.value.trim(), email=nEmail.value.trim(), password=nPass.value;
+  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!name){ m.textContent="Please enter the trainee's full name."; m.className="msg err"; return; }
+  if(!email){ m.textContent="Please enter an email address."; m.className="msg err"; return; }
+  if(!emailOk){ m.textContent="Please enter a valid email (e.g. name@galaxy.com)."; m.className="msg err"; return; }
+  if(!password){ m.textContent="Please enter a temporary password."; m.className="msg err"; return; }
+  if(password.length<6){ m.textContent="Password must be at least 6 characters."; m.className="msg err"; return; }
+  try{
+    await api("/auth/register","POST",{name,email,password,role:"trainee"});
+    m.textContent="✓ Account created — share the email & password with the trainee";
+    m.className="msg ok"; loadTrainees(); setTimeout(closeModal,1200);
+  }catch(e){ m.textContent=e.message; m.className="msg err"; }
 }
 async function editT(id,cur){const name=prompt("New name:",cur);if(!name)return;try{await api("/users/"+id,"PATCH",{name});loadTrainees();}catch(e){alert(e.message);}}
 async function toggleA(id,active){try{await api("/users/"+id+"/active","PATCH",{active});loadTrainees();}catch(e){alert(e.message);}}
-async function resetP(id){const newPassword=prompt("New temporary password for this trainee:");if(!newPassword)return;try{await api("/users/"+id+"/reset-password","PATCH",{newPassword});alert("Password reset ✓ — give the new password to the trainee");}catch(e){alert(e.message);}}
+async function resetP(id){const newPassword=prompt("New temporary password for this trainee (min 6 characters):");if(!newPassword)return;if(newPassword.length<6){alert("Password must be at least 6 characters.");return;}try{await api("/users/"+id+"/reset-password","PATCH",{newPassword});alert("Password reset ✓ — give the new password to the trainee");}catch(e){alert(e.message);}}
 function logout(){token="";me=null;localStorage.removeItem("tg_token");localStorage.removeItem("tg_user");loginMsg.textContent="";route();}
 route();
 </script>
