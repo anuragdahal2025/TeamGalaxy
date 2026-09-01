@@ -5,113 +5,227 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Team Galaxy — H&S Training</title>
 <style>
-  * { box-sizing: border-box; font-family: system-ui, sans-serif; }
-  body { margin:0; background:#0f172a; color:#e2e8f0; display:flex; justify-content:center; align-items:center; min-height:100vh; }
-  .card { background:#1e293b; padding:32px; border-radius:14px; width:340px; box-shadow:0 10px 30px rgba(0,0,0,.4); }
-  h1 { font-size:20px; margin:0 0 4px; }
-  p.sub { margin:0 0 20px; color:#94a3b8; font-size:13px; }
-  label { font-size:13px; display:block; margin:12px 0 4px; }
-  input { width:100%; padding:10px; border:1px solid #334155; border-radius:8px; background:#0f172a; color:#e2e8f0; }
-  button { width:100%; margin-top:18px; padding:11px; border:0; border-radius:8px; background:#6366f1; color:#fff; font-weight:600; cursor:pointer; }
-  button:hover { background:#4f46e5; }
-  .msg { margin-top:12px; font-size:13px; min-height:18px; }
-  .err { color:#f87171; } .ok { color:#4ade80; }
-  .hidden { display:none; }
-  .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; background:#6366f1; }
-  .logout { background:#334155; margin-top:10px; }
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0A0E1A;--bg2:#0F1524;--card:#151C2E;--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);--txt:#EAF0FA;--mut:#8695AE;--mut2:#5D6B84;--org:#FF6A2C;--org2:#FF9146;--cyan:#25D0C4;--yellow:#FBBF24;--green:#34D399;--red:#F87171;--violet:#8B7CF6}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+h1,h2,h3{font-family:'Sora',sans-serif}
+.hidden{display:none!important}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.shell{display:flex;min-height:100vh}
+.side{width:240px;background:var(--bg2);border-right:1px solid var(--line);padding:24px 16px;display:flex;flex-direction:column;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:.5px;margin:4px 8px 28px}
+.nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;color:var(--mut);font-weight:500;font-size:14px;margin-bottom:4px;text-decoration:none;cursor:pointer}
+.nav a.on{background:linear-gradient(90deg,rgba(255,106,44,.18),transparent);color:var(--txt);border:1px solid rgba(255,106,44,.3)}
+.nav a .ic{width:20px;text-align:center;opacity:.9}
+.side .bottom{margin-top:auto}
+.main{flex:1;display:flex;flex-direction:column}
+.top{height:74px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;flex-shrink:0}
+.bodyp{padding:28px 30px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.tile .lab{color:var(--mut);font-size:12.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
+.tile .val{font-family:'Sora';font-size:28px;font-weight:700;margin-top:8px}
+.btn{background:linear-gradient(90deg,var(--org),var(--org2));color:#fff;border:0;padding:11px 18px;border-radius:11px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:'Sora'}
+.btn.ghost{background:transparent;border:1px solid var(--line2);color:var(--txt)}
+.btn.sm{padding:7px 13px;font-size:12.5px;border-radius:9px}
+.btn.danger{background:transparent;border:1px solid rgba(248,113,113,.4);color:var(--red)}
+.pill{padding:3px 10px;border-radius:8px;font-size:12px;font-weight:600}
+.av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--cyan));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;font-family:'Sora'}
+.grid{display:grid;gap:18px}
+.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--org),var(--yellow))}
+input{width:100%;padding:11px 13px;border:1px solid var(--line2);border-radius:10px;background:var(--bg2);color:var(--txt);font-size:14px;font-family:'Inter'}
+label{font-size:12.5px;color:var(--mut);display:block;margin:14px 0 6px;font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{color:var(--mut2);font-size:11px;text-transform:uppercase;letter-spacing:.5px;text-align:left;padding:8px 10px;font-weight:600}
+td{padding:13px 10px;border-top:1px solid var(--line);font-size:14px}
+.msg{font-size:13px;min-height:18px;margin-top:8px}.err{color:var(--red)}.ok{color:var(--green)}
+.modalbg{position:fixed;inset:0;background:rgba(6,9,16,.6);display:flex;align-items:center;justify-content:center;z-index:50}
 </style>
 </head>
 <body>
-  <div class="card">
-    <!-- LOGIN VIEW -->
-    <div id="loginView">
-      <h1>Team Galaxy</h1>
-      <p class="sub">360° Health & Safety Training — Sign in</p>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginView" style="display:flex;min-height:100vh">
+  <div style="flex:1;position:relative;overflow:hidden;background:radial-gradient(120% 90% at 20% 10%,rgba(255,106,44,.22),transparent 55%),radial-gradient(100% 80% at 90% 90%,rgba(37,208,196,.18),transparent 60%),var(--bg2);padding:56px;display:flex;flex-direction:column">
+    <div class="logo" style="margin:0">◐&nbsp;TEAM&nbsp;GALAXY</div>
+    <div style="margin:auto 0;max-width:430px">
+      <div class="chip" style="color:#12161F;font-weight:800;margin-bottom:22px;background:repeating-linear-gradient(45deg,#FFB020 0 14px,#12161F 14px 28px)">⚠ HEALTH & SAFETY TRAINING</div>
+      <h1 style="font-size:44px;line-height:1.1;font-weight:800">Train safe.<br>In every direction.</h1>
+      <p style="color:var(--mut);margin-top:18px;font-size:15px;line-height:1.6">Immersive 360° hazard training for logistics & warehousing teams — interactive scenes, live challenges, and a verifiable Safety Passport.</p>
+    </div>
+  </div>
+  <div style="width:460px;display:flex;align-items:center;justify-content:center;padding:40px">
+    <div style="width:340px">
+      <h2 style="font-size:26px">Sign in</h2>
+      <p style="color:var(--mut);margin-top:6px;font-size:14px">Welcome back. Enter your credentials.</p>
       <label>Email</label>
       <input id="email" type="email" value="admin@galaxy.com" />
       <label>Password</label>
       <input id="password" type="password" value="Admin123" />
-      <button onclick="login()">Log In</button>
-      <div id="msg" class="msg"></div>
-    </div>
-
-    <!-- DASHBOARD VIEW -->
-    <div id="dashView" class="hidden">
-      <h1>Welcome, <span id="uName"></span></h1>
-      <p class="sub">Role: <span id="uRole" class="badge"></span></p>
-
-      <div id="adminPanel" class="hidden">
-        <p class="sub">Admin — create a trainee account:</p>
-        <input id="nName" placeholder="Full name" />
-        <input id="nEmail" placeholder="Email" style="margin-top:8px" />
-        <input id="nPass" placeholder="Password" style="margin-top:8px" />
-        <button onclick="createTrainee()">Create Trainee</button>
-      </div>
-
-      <div id="traineePanel" class="hidden">
-        <p class="sub">Your training modules will appear here (coming next).</p>
-      </div>
-
-      <div id="msg2" class="msg"></div>
-      <button class="logout" onclick="logout()">Log Out</button>
+      <button class="btn" style="width:100%;margin-top:20px;padding:13px" onclick="login()">Log In →</button>
+      <div id="loginMsg" class="msg"></div>
+      <div style="margin-top:16px;padding:11px 13px;background:rgba(37,208,196,.08);border:1px solid rgba(37,208,196,.2);border-radius:10px;font-size:12px;color:var(--mut)">ℹ Accounts are created by your administrator. No self-registration.</div>
     </div>
   </div>
+</div>
+
+<!-- ============ TRAINEE ============ -->
+<div id="traineeView" class="hidden"><div class="shell">
+  <div class="side">
+    <div class="logo">◐&nbsp;TEAM&nbsp;GALAXY</div>
+    <div class="nav">
+      <a class="on"><span class="ic">▤</span>Dashboard</a>
+      <a><span class="ic">▦</span>Training Modules</a>
+      <a><span class="ic">♛</span>Leaderboard</a>
+      <a><span class="ic">✦</span>Safety Passport</a>
+      <a><span class="ic">↺</span>My Attempts</a>
+    </div>
+    <div class="bottom nav"><a onclick="logout()"><span class="ic">⏻</span>Log Out</a></div>
+  </div>
+  <div class="main">
+    <div class="top">
+      <div style="font-family:Sora;font-weight:700;font-size:18px">Welcome back, <span id="tName"></span> 👋</div>
+      <span class="chip" style="background:rgba(37,208,196,.16);color:#5EE6DB">● TRAINEE</span>
+    </div>
+    <div class="bodyp">
+      <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:22px">
+        <div class="tile"><div class="lab">Safety Passport</div><div class="val">4 / 6</div></div>
+        <div class="tile"><div class="lab">Avg Score</div><div class="val" style="color:var(--green)">88%</div></div>
+        <div class="tile"><div class="lab">Badges</div><div class="val" style="color:var(--yellow)">7 ✦</div></div>
+        <div class="tile"><div class="lab">Rank</div><div class="val">#3</div></div>
+      </div>
+      <h3 style="font-size:17px;margin-bottom:14px">Your Training Modules</h3>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card" style="padding:18px"><b>Manual Handling</b><div class="bar" style="margin-top:12px"><i style="width:100%"></i></div><div style="color:var(--green);font-size:12px;margin-top:8px">✓ Completed</div></div>
+        <div class="card" style="padding:18px"><b>Working at Height</b><div class="bar" style="margin-top:12px"><i style="width:60%"></i></div><div style="color:var(--yellow);font-size:12px;margin-top:8px">◐ In progress</div></div>
+        <div class="card" style="padding:18px"><b>Hazard Perception</b><div class="bar" style="margin-top:12px"><i style="width:0%"></i></div><div style="color:var(--mut);font-size:12px;margin-top:8px">Not started</div></div>
+      </div>
+      <p style="color:var(--mut2);font-size:12px;margin-top:20px">Training scenes, quizzes & scoring arrive in Sprint 2.</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============ ADMIN ============ -->
+<div id="adminView" class="hidden"><div class="shell">
+  <div class="side">
+    <div class="logo">◐&nbsp;TEAM&nbsp;GALAXY</div>
+    <div class="nav">
+      <a class="on"><span class="ic">▤</span>Overview</a>
+      <a><span class="ic">☷</span>Trainees</a>
+      <a><span class="ic">▦</span>Modules & Questions</a>
+      <a><span class="ic">◔</span>Analytics</a>
+      <a><span class="ic">≣</span>Audit Log</a>
+    </div>
+    <div class="bottom nav"><a onclick="logout()"><span class="ic">⏻</span>Log Out</a></div>
+  </div>
+  <div class="main">
+    <div class="top">
+      <div style="font-family:Sora;font-weight:700;font-size:18px">Admin Overview</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="btn sm" onclick="openModal()">+ New Trainee</button>
+        <span class="chip" style="background:rgba(139,124,246,.18);color:#B9AEFF">● ADMIN</span>
+        <span id="aName" style="font-weight:600;font-size:14px"></span>
+      </div>
+    </div>
+    <div class="bodyp">
+      <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:22px">
+        <div class="tile"><div class="lab">Total Trainees</div><div class="val" id="stTotal">–</div></div>
+        <div class="tile"><div class="lab">Active</div><div class="val" style="color:var(--green)" id="stActive">–</div></div>
+        <div class="tile"><div class="lab">Inactive</div><div class="val" style="color:var(--red)" id="stInactive">–</div></div>
+        <div class="tile"><div class="lab">Modules</div><div class="val">6</div></div>
+      </div>
+      <div class="card" style="padding:22px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3 style="font-size:16px">Trainee Management</h3>
+          <button class="btn ghost sm" onclick="loadTrainees()">↻ Refresh</button>
+        </div>
+        <table>
+          <thead><tr><th>Trainee</th><th>Email</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div id="adminMsg" class="msg"></div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ===== Create Trainee modal ===== -->
+<div id="modal" class="modalbg hidden">
+  <div class="card" style="width:440px;padding:0;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)">
+      <div style="font-family:Sora;font-weight:700;font-size:16px">Create trainee account</div>
+      <span style="color:var(--mut);cursor:pointer" onclick="closeModal()">✕</span>
+    </div>
+    <div style="padding:22px">
+      <label>Full name</label><input id="nName" placeholder="e.g. Sunita Rai" />
+      <label>Email (this is their login ID)</label><input id="nEmail" placeholder="email@galaxy.com" />
+      <label>Temporary password (you give this to the trainee)</label><input id="nPass" placeholder="min 4 characters" />
+      <div style="margin-top:14px;padding:10px 12px;background:rgba(37,208,196,.08);border:1px solid rgba(37,208,196,.2);border-radius:9px;font-size:12px;color:var(--mut)">ℹ Trainees can't self-register — you create the account and share the email + temporary password with them. RBAC enforced.</div>
+      <div id="createMsg" class="msg"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--line)">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="createTrainee()">Create account</button>
+    </div>
+  </div>
+</div>
 
 <script>
-const API = "http://localhost:5050/api/auth";
-let token = "";
+const API="http://localhost:5050/api";
+let token=localStorage.getItem("tg_token")||"";
+let me=JSON.parse(localStorage.getItem("tg_user")||"null");
 
-async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const msg = document.getElementById("msg");
-  msg.textContent = "Signing in...";
-  msg.className = "msg";
-  try {
-    const res = await fetch(API + "/login", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-    if (!res.ok) { msg.textContent = data.message; msg.className="msg err"; return; }
-    token = data.token;
-    showDashboard(data.user);
-  } catch { msg.textContent = "Cannot reach server. Is it running?"; msg.className="msg err"; }
+async function api(path,method="GET",body){
+  const res=await fetch(API+path,{method,headers:{"Content-Type":"application/json",...(token?{Authorization:"Bearer "+token}:{})},body:body?JSON.stringify(body):undefined});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.message||"Request failed");
+  return data;
 }
-
-function showDashboard(user) {
-  document.getElementById("loginView").classList.add("hidden");
-  document.getElementById("dashView").classList.remove("hidden");
-  document.getElementById("uName").textContent = user.name;
-  document.getElementById("uRole").textContent = user.role;
-  document.getElementById("adminPanel").classList.toggle("hidden", user.role !== "admin");
-  document.getElementById("traineePanel").classList.toggle("hidden", user.role !== "trainee");
+async function login(){
+  const email=document.getElementById("email").value,password=document.getElementById("password").value;
+  const m=loginMsg;m.textContent="Signing in...";m.className="msg";
+  try{const d=await api("/auth/login","POST",{email,password});token=d.token;me=d.user;
+    localStorage.setItem("tg_token",token);localStorage.setItem("tg_user",JSON.stringify(me));route();}
+  catch(e){m.textContent=e.message;m.className="msg err";}
 }
-
-async function createTrainee() {
-  const msg2 = document.getElementById("msg2");
-  const body = {
-    name: document.getElementById("nName").value,
-    email: document.getElementById("nEmail").value,
-    password: document.getElementById("nPass").value,
-    role: "trainee"
-  };
-  const res = await fetch(API + "/register", {
-    method:"POST",
-    headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
-    body: JSON.stringify(body)
-  });
-  const data = await res.json();
-  msg2.textContent = data.message;
-  msg2.className = res.ok ? "msg ok" : "msg err";
+function route(){
+  loginView.classList.add("hidden");traineeView.classList.add("hidden");adminView.classList.add("hidden");
+  if(!me){loginView.classList.remove("hidden");return;}
+  if(me.role==="admin"){adminView.classList.remove("hidden");aName.textContent=me.name;loadTrainees();}
+  else{traineeView.classList.remove("hidden");tName.textContent=me.name;}
 }
-
-function logout() {
-  token = "";
-  document.getElementById("dashView").classList.add("hidden");
-  document.getElementById("loginView").classList.remove("hidden");
-  document.getElementById("msg").textContent = "";
+async function loadTrainees(){
+  const m=adminMsg;m.textContent="";
+  try{const list=await api("/users");
+    const active=list.filter(u=>u.active).length;
+    stTotal.textContent=list.length;stActive.textContent=active;stInactive.textContent=list.length-active;
+    rows.innerHTML=list.map(u=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:10px"><div class="av" style="width:32px;height:32px;font-size:12px">${(u.name[0]||'?').toUpperCase()}</div><b>${u.name}</b></div></td>
+      <td style="color:var(--mut)">${u.email}</td>
+      <td>${u.active?'<span class="pill" style="background:rgba(52,211,153,.14);color:var(--green)">● Active</span>':'<span class="pill" style="background:rgba(248,113,113,.14);color:var(--red)">○ Inactive</span>'}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn ghost sm" onclick="editT('${u._id}','${u.name.replace(/'/g,"")}')">Edit</button>
+        <button class="btn ghost sm" onclick="toggleA('${u._id}',${!u.active})">${u.active?'Deactivate':'Reactivate'}</button>
+        <button class="btn danger sm" onclick="resetP('${u._id}')">Reset PW</button>
+      </td></tr>`).join("")||`<tr><td colspan="4" style="color:var(--mut)">No trainees yet — click "+ New Trainee".</td></tr>`;
+  }catch(e){m.textContent=e.message;m.className="msg err";}
 }
+function openModal(){modal.classList.remove("hidden");}
+function closeModal(){modal.classList.add("hidden");createMsg.textContent="";nName.value=nEmail.value=nPass.value="";}
+async function createTrainee(){
+  const m=createMsg;if(!nName.value||!nEmail.value||!nPass.value){m.textContent="Fill all fields";m.className="msg err";return;}
+  try{await api("/auth/register","POST",{name:nName.value,email:nEmail.value,password:nPass.value,role:"trainee"});
+    m.textContent="✓ Account created — share the email & password with the trainee";m.className="msg ok";loadTrainees();
+    setTimeout(closeModal,1200);}
+  catch(e){m.textContent=e.message;m.className="msg err";}
+}
+async function editT(id,cur){const name=prompt("New name:",cur);if(!name)return;try{await api("/users/"+id,"PATCH",{name});loadTrainees();}catch(e){alert(e.message);}}
+async function toggleA(id,active){try{await api("/users/"+id+"/active","PATCH",{active});loadTrainees();}catch(e){alert(e.message);}}
+async function resetP(id){const newPassword=prompt("New temporary password for this trainee:");if(!newPassword)return;try{await api("/users/"+id+"/reset-password","PATCH",{newPassword});alert("Password reset ✓ — give the new password to the trainee");}catch(e){alert(e.message);}}
+function logout(){token="";me=null;localStorage.removeItem("tg_token");localStorage.removeItem("tg_user");loginMsg.textContent="";route();}
+route();
 </script>
 </body>
 </html>
