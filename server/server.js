@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 
@@ -9,9 +10,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => res.send("Team Galaxy API is running"));
+// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+
+// Serve the frontend (client folder)
+app.use(express.static(path.join(__dirname, "../client")));
 
 const PORT = process.env.PORT || 5050;
 mongoose

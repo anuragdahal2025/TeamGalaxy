@@ -173,7 +173,7 @@ td{padding:13px 10px;border-top:1px solid var(--line);font-size:14px}
 </div>
 
 <script>
-const API="http://localhost:5050/api";
+const API=(location.protocol.startsWith("http")?"/api":"http://localhost:5050/api");
 let token=localStorage.getItem("tg_token")||"";
 let me=JSON.parse(localStorage.getItem("tg_user")||"null");
 
