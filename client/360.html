@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>360° Training Scene — Team Galaxy</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,Segoe UI,sans-serif}
+  :root{--org:#FF6A2C;--cyan:#25D0C4;--bg:#0A0E1A;--card:#151C2E;--txt:#EAF0FA;--mut:#8695AE;--green:#34D399}
+  body{background:var(--bg);color:var(--txt);height:100vh;overflow:hidden}
+  #bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#0F1524;border-bottom:1px solid rgba(255,255,255,.08)}
+  #bar b{font-weight:800;letter-spacing:.5px}
+  #bar b span{color:var(--org)}
+  .chip{padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(251,191,36,.16);color:#FBBF24}
+  #pano{width:100%;height:calc(100vh - 56px)}
+  #hud{position:fixed;left:16px;bottom:16px;background:rgba(10,14,26,.9);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px;max-width:340px}
+  #hud h3{font-size:15px;margin-bottom:6px}
+  #hud p{font-size:13px;color:var(--mut);line-height:1.4}
+  #count{color:var(--green);font-weight:700}
+  .btn{background:linear-gradient(90deg,var(--org),#FF9146);color:#fff;border:0;padding:10px 16px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:10px}
+  /* popup */
+  #pop{position:fixed;inset:0;background:rgba(6,9,16,.6);display:none;align-items:center;justify-content:center;z-index:50}
+  #pop .box{background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:22px;max-width:380px}
+  #pop h2{font-size:18px;margin-bottom:8px}
+  #pop p{font-size:14px;color:var(--mut);line-height:1.5;margin-bottom:14px}
+  .tag{display:inline-block;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(248,113,113,.16);color:#F87171;margin-bottom:10px}
+  /* custom hotspot look */
+  .hs{width:30px;height:30px;border-radius:50%;background:var(--org);border:3px solid #fff;box-shadow:0 0 0 6px rgba(255,106,44,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;animation:pulse 1.6s infinite}
+  .hs.found{background:var(--green);box-shadow:0 0 0 6px rgba(52,211,153,.3)}
+  @keyframes pulse{0%{box-shadow:0 0 0 4px rgba(255,106,44,.4)}70%{box-shadow:0 0 0 14px rgba(255,106,44,0)}100%{box-shadow:0 0 0 4px rgba(255,106,44,0)}}
+</style>
+</head>
+<body>
+  <div id="bar">
+    <b>◐ TEAM <span>GALAXY</span> · Working at Height</b>
+    <span class="chip">🧭 Drag to look around · Find the hazards</span>
+  </div>
+  <div id="pano"></div>
+
+  <div id="hud">
+    <h3>Spot the hazards in this scene</h3>
+    <p>Look around the 360° warehouse and click each glowing marker. Found: <span id="count">0</span> / 3</p>
+    <button class="btn" id="quizBtn" onclick="startQuiz()" style="display:none">Start knowledge quiz →</button>
+  </div>
+
+  <!-- hazard info popup -->
+  <div id="pop"><div class="box">
+    <span class="tag" id="popTag">HAZARD</span>
+    <h2 id="popTitle"></h2>
+    <p id="popText"></p>
+    <button class="btn" onclick="closePop()">Got it ✓</button>
+  </div></div>
+
+<script>
+const hazards = {
+  ladder:{title:"Unsecured ladder", text:"This ladder is not secured or footed. Always secure ladders, maintain three points of contact, and never overreach when working at height."},
+  shelf:{title:"Overloaded / unstable racking", text:"Racking must not be overloaded and loads must be stable. Report damaged or leaning racking immediately and never climb the racking."},
+  floor:{title:"Trip hazard on the floor", text:"Trailing items and spills on walkways cause slips and trips. Keep walkways clear and clean spills straight away."}
+};
+let found = new Set();
+
+const viewer = pannellum.viewer('pano', {
+  type: "equirectangular",
+  panorama: "warehouse_pano.jpg",
+  autoLoad: true,
+  showControls: true,
+  hfov: 100,
+  hotSpots: [
+    { pitch: -3, yaw: 5,   cssClass:"hs", createTooltipFunc: mk, createTooltipArgs:{id:"ladder",label:"!"} },
+    { pitch: 2,  yaw: -70, cssClass:"hs", createTooltipFunc: mk, createTooltipArgs:{id:"shelf", label:"!"} },
+    { pitch: -18,yaw: 120, cssClass:"hs", createTooltipFunc: mk, createTooltipArgs:{id:"floor", label:"!"} }
+  ]
+});
+
+function mk(hotSpotDiv, args){
+  hotSpotDiv.classList.add("hs");
+  hotSpotDiv.setAttribute("data-id", args.id);
+  hotSpotDiv.innerHTML = "!";
+  hotSpotDiv.onclick = () => openHazard(args.id, hotSpotDiv);
+}
+
+function openHazard(id, el){
+  const h = hazards[id];
+  document.getElementById("popTitle").textContent = h.title;
+  document.getElementById("popText").textContent = h.text;
+  document.getElementById("pop").style.display = "flex";
+  if(!found.has(id)){
+    found.add(id);
+    if(el){ el.classList.add("found"); el.innerHTML="✓"; }
+    document.getElementById("count").textContent = found.size;
+    if(found.size === 3){ document.getElementById("quizBtn").style.display="inline-block"; }
+  }
+}
+function closePop(){ document.getElementById("pop").style.display="none"; }
+function startQuiz(){
+  // In the real app this navigates to the quiz page for this module
+  alert("All 3 hazards found! Starting the knowledge quiz for this module…");
+  // window.location.href = "quiz.html?module=working-at-height";
+}
+</script>
+</body>
+</html>

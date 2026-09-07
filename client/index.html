@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign in — Team Galaxy</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+<div class="auth">
+  <!-- left hero -->
+  <div class="hero">
+    <div class="logo">◐&nbsp;TEAM&nbsp;<b>GALAXY</b></div>
+    <div class="mid">
+      <span class="hbadge">⚠ HEALTH &amp; SAFETY TRAINING</span>
+      <h1>Train safe.<br>In every direction.</h1>
+      <p>Immersive 360° hazard training for logistics &amp; warehousing teams — interactive scenes,
+         live challenges and a verifiable Safety Passport.</p>
+      <div class="hfeat">
+        <div>🌐 360° scenes</div>
+        <div>🎮 Interactive quizzes</div>
+        <div>🎫 Safety Passport</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- right form -->
+  <div class="panel">
+    <div class="box">
+      <div class="logo" style="margin-bottom:22px">◐&nbsp;TEAM&nbsp;<b>GALAXY</b></div>
+      <h2>Sign in</h2>
+      <p class="sub">Welcome back. Enter your credentials.</p>
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="name@galaxy.com" autocomplete="username" />
+
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
+
+      <button class="btn block" style="margin-top:22px" onclick="login()">Log in →</button>
+      <div id="loginMsg" class="msg"></div>
+
+      <div class="note">ℹ Accounts are created by your administrator. There is no self-registration.
+        On your first login you will be asked to set your own password.</div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/login.js"></script>
+</body>
+</html>
