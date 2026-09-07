@@ -17,8 +17,7 @@ router.get("/me", verifyToken, async (req, res) => {
   res.json(safe(u));
 });
 
-/* CHANGE MY OWN PASSWORD — any signed-in user.
-   Admins never see or set a trainee's real password; each user sets their own here. */
+/* CHANGE MY OWN PASSWORD — any signed-in user. */
 router.patch("/me/password", verifyToken, async (req, res) => {
   try {
     const currentPassword = req.body.currentPassword || "";
@@ -58,7 +57,6 @@ async function loadManageable(req, res) {
   const target = await User.findById(req.params.id);
   if (!target) { res.status(404).json({ message: "User not found." }); return null; }
   if (target.role === "admin") { res.status(403).json({ message: "Admin accounts cannot be changed here." }); return null; }
-  // sub-admins may only manage trainees
   if (req.user.role === "subadmin" && target.role !== "trainee") {
     res.status(403).json({ message: "Sub-admins can only manage trainees." }); return null;
   }
@@ -93,10 +91,7 @@ router.patch("/:id/active", verifyToken, requireStaff, async (req, res) => {
   res.json(safe(target));
 });
 
-/* RE-ISSUE A TEMPORARY PASSWORD (for a locked-out user).
-   The system generates a random one-time code, shown to staff ONCE to hand over.
-   The user is then forced to set their own password on next login.
-   Staff never see the user's real (chosen) password. */
+/* RE-ISSUE A TEMPORARY PASSWORD (for a locked-out user). */
 router.patch("/:id/reissue-temp", verifyToken, requireStaff, async (req, res) => {
   try {
     const target = await loadManageable(req, res);
@@ -108,6 +103,22 @@ router.patch("/:id/reissue-temp", verifyToken, requireStaff, async (req, res) =>
     res.json({ message: "Temporary password issued.", tempPassword: temp });
   } catch (e) {
     res.status(500).json({ message: "Could not issue a temporary password." });
+  }
+});
+
+/* DELETE an account permanently.
+   Staff only. Sub-admins can delete trainees only; nobody can delete an admin
+   (both rules enforced by loadManageable). You cannot delete yourself. */
+router.delete("/:id", verifyToken, requireStaff, async (req, res) => {
+  try {
+    const target = await loadManageable(req, res);
+    if (!target) return;
+    if (String(target._id) === String(req.user.id))
+      return res.status(400).json({ message: "You cannot delete your own account." });
+    await target.deleteOne();
+    res.json({ message: "Account deleted." });
+  } catch (e) {
+    res.status(500).json({ message: "Could not delete the account." });
   }
 });
 

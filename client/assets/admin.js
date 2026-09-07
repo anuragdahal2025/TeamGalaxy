@@ -7,12 +7,11 @@ document.getElementById("av").textContent = initials(me.name);
 document.getElementById("roleChip").textContent = isAdmin ? "● ADMIN" : "● SUB-ADMIN";
 document.getElementById("roleChip").className = "chip " + (isAdmin ? "brand" : "indigo");
 
-// sub-admins are hidden for a sub-admin user (they can't manage other staff)
+// sub-admins are hidden for a sub-admin user
 if (!isAdmin) {
   ["navStaff", "tileStaff", "cardStaff"].forEach(id => document.getElementById(id)?.classList.add("hidden"));
 }
 
-// fill "me email" from server (token only has name/role)
 api("/users/me").then(u => { document.getElementById("meEmail").textContent = u.email; }).catch(() => {});
 
 /* ---- view switching ---- */
@@ -45,6 +44,7 @@ function row(u) {
       <button class="btn sm ghost" onclick="openEdit('${u.id}','${esc(u.name)}','${esc(u.email)}')">Edit</button>
       ${toggle}
       <button class="btn sm ghost" onclick="reissue('${u.id}','${esc(u.name)}')">Reset access</button>
+      <button class="btn sm danger" onclick="delUser('${u.id}','${esc(u.name)}')">Delete</button>
     </div></td></tr>`;
 }
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -124,6 +124,13 @@ async function reissue(id, name) {
     document.getElementById("tempFor").textContent = name;
     document.getElementById("tempCode").textContent = r.tempPassword;
     document.getElementById("mTemp").classList.add("show");
+    loadTrainees(); loadStaff();
+  } catch (e) { alert(e.message); }
+}
+async function delUser(id, name) {
+  if (!confirm(`Permanently delete ${name}? This removes the account for good and cannot be undone.`)) return;
+  try {
+    await api("/users/" + id, "DELETE");
     loadTrainees(); loadStaff();
   } catch (e) { alert(e.message); }
 }
