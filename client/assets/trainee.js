@@ -4,11 +4,12 @@ document.getElementById("hiName").textContent = me.name.split(" ")[0];
 document.getElementById("av").textContent = initials(me.name);
 api("/users/me").then(u => { document.getElementById("meEmail").textContent = u.email; }).catch(() => {});
 
-/* demo modules — "Working at Height" opens the live 360° scene */
+// Demo module list. Progress is not tracked yet (Sprint 2), so every module
+// starts as "Not started" until quizzes + score-saving are built.
 const modules = [
-  { t: "Working at Height", d: "360° spot-the-hazard scene + quiz.", pct: 60, tag: "brand", link: "360.html", cta: "Enter 360° scene →" },
-  { t: "Manual Handling", d: "Safe lifting technique and posture.", pct: 100, tag: "green", done: true },
-  { t: "Fire Safety", d: "Extinguisher types and evacuation.", pct: 40, tag: "amber" },
+  { t: "Working at Height", d: "360° spot-the-hazard scene + quiz.", pct: 0, tag: "brand", link: "360.html", cta: "Enter 360° scene →" },
+  { t: "Manual Handling", d: "Safe lifting technique and posture.", pct: 0, tag: "gray" },
+  { t: "Fire Safety", d: "Extinguisher types and evacuation.", pct: 0, tag: "gray" },
   { t: "PPE & Signage", d: "Personal protective equipment basics.", pct: 0, tag: "gray" },
   { t: "Vehicle & Forklift Safety", d: "Pedestrian and traffic separation.", pct: 0, tag: "gray" },
   { t: "Hazardous Materials", d: "Storage, labelling and spill response.", pct: 0, tag: "gray" },
