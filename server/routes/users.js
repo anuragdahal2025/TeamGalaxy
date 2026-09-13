@@ -57,13 +57,14 @@ async function loadManageable(req, res) {
   const target = await User.findById(req.params.id);
   if (!target) { res.status(404).json({ message: "User not found." }); return null; }
   if (target.role === "admin") { res.status(403).json({ message: "Admin accounts cannot be changed here." }); return null; }
+  // sub-admins may only manage trainees
   if (req.user.role === "subadmin" && target.role !== "trainee") {
     res.status(403).json({ message: "Sub-admins can only manage trainees." }); return null;
   }
   return target;
 }
 
-/* edit name / email */
+/* edit name / email (staff: sub-admin limited to trainees) */
 router.patch("/:id", verifyToken, requireStaff, async (req, res) => {
   try {
     const target = await loadManageable(req, res);
@@ -82,8 +83,8 @@ router.patch("/:id", verifyToken, requireStaff, async (req, res) => {
   }
 });
 
-/* activate / deactivate */
-router.patch("/:id/active", verifyToken, requireStaff, async (req, res) => {
+/* activate / deactivate — ADMIN ONLY */
+router.patch("/:id/active", verifyToken, requireAdmin, async (req, res) => {
   const target = await loadManageable(req, res);
   if (!target) return;
   target.active = !!req.body.active;
@@ -91,7 +92,7 @@ router.patch("/:id/active", verifyToken, requireStaff, async (req, res) => {
   res.json(safe(target));
 });
 
-/* RE-ISSUE A TEMPORARY PASSWORD (for a locked-out user). */
+/* RE-ISSUE A TEMPORARY PASSWORD (staff: sub-admin limited to trainees). */
 router.patch("/:id/reissue-temp", verifyToken, requireStaff, async (req, res) => {
   try {
     const target = await loadManageable(req, res);
@@ -106,10 +107,9 @@ router.patch("/:id/reissue-temp", verifyToken, requireStaff, async (req, res) =>
   }
 });
 
-/* DELETE an account permanently.
-   Staff only. Sub-admins can delete trainees only; nobody can delete an admin
-   (both rules enforced by loadManageable). You cannot delete yourself. */
-router.delete("/:id", verifyToken, requireStaff, async (req, res) => {
+/* DELETE an account permanently — ADMIN ONLY.
+   Nobody can delete an admin account, and you cannot delete yourself. */
+router.delete("/:id", verifyToken, requireAdmin, async (req, res) => {
   try {
     const target = await loadManageable(req, res);
     if (!target) return;
